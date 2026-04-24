@@ -5,12 +5,16 @@ require_once __DIR__ . '/../models/Oferta.php';
 require_once __DIR__ . '/../models/Empleador.php';
 require_once __DIR__ . '/../models/Categoria.php';
 
+// TODO: Falta integrar con BD
+
 class buscadorController
 {
     private $ubicacionModel;
     private $ofertaModel;
     private $empleadorModel;
     private $categoriaModel;
+
+
 
     public function __construct()
     {
@@ -23,11 +27,38 @@ class buscadorController
         $this->categoriaModel = new Categoria($db);
     }
 
-    public function index()
+    public function showBuscador()
     {
-        
+        $keyword = $_GET['keyword'] ?? '';
+        $provincia = $_GET['provincia'] ?? '';
+        $categoria = $_GET['categoria'] ?? '';
+        if ($keyword !== '' || $provincia !== '' || $categoria !== '') {
+            $ofertas = $this->ofertaModel->searchByKeyword($keyword, $provincia, $categoria);
+        } else {
+            $ofertas = $this->ofertaModel->getAll()->fetch_all(MYSQLI_ASSOC);
+        }
+        $ubicaciones = $this->ubicacionModel->getAll();
+        $provincias = $this->ubicacionModel->getDistinctProvincias();
+        $empleadores = $this->empleadorModel->getAll();
+        $categorias = $this->categoriaModel->getAll();
+        $categoriasDistinct = $this->categoriaModel->getDistinctCategoria();
+
+        require 'app/views/buscarEmpleos.php';
     }
-        public function getOfertas()
+
+    public function verOferta()
+    {
+        $idOferta = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $oferta = null;
+
+        if ($idOferta > 0) {
+            $oferta = $this->ofertaModel->getOfertaConEmpresa($idOferta);
+        }
+
+        require 'app/views/verOferta.php';
+    }
+
+    public function getOfertas()
     {
         return $this->ofertaModel->getAll()->fetch_all(MYSQLI_ASSOC);
     }
@@ -52,7 +83,7 @@ class buscadorController
         return $this->categoriaModel->getAll()->fetch_all(MYSQLI_ASSOC);
     }
 
-        public function getDistinctCategoria()
+    public function getDistinctCategoria()
     {
         return $this->categoriaModel->getDistinctCategoria()->fetch_all(MYSQLI_ASSOC);
     }

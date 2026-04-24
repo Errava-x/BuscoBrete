@@ -7,8 +7,9 @@
     <title>BuscoBrete - Home</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/styles.css">
-
-
+    <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -25,6 +26,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- Script de busqueda -->
+    <script src="<?= BASE_URL ?>/public/js/search.js"></script>
 </head>
 
 <body class="body-bckg">
@@ -32,7 +37,7 @@
 
 
     <!--Top Nav Bar  -->
-<?php require_once __DIR__ . '/templates/navbar.php'; ?>
+    <?php require_once __DIR__ . '/templates/navbar.php'; ?>
     <!--Top Nav Bar  -->
 
     <main>
@@ -45,19 +50,20 @@
                 <p class="mb-4 text-center">
                     Explora miles de oportunidades en tecnología, negocios y más
                 </p>
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="input-group shadow">
-                            <input class="form-control form-control-lg text-center"
-                                placeholder="Busca por puesto, empresa o ubicación">
-                            <button class="btn btn-primary">
-                                Buscar
-                            </button>
+                <form id="formSearchBar">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="input-group shadow">
 
+                                <input class="form-control form-control-lg text-center" name="keyword" id="keyword"
+                                    placeholder="Busca por puesto, empresa o ubicación">
+                                <button class="btn btn-primary">
+                                    Buscar
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </form>
         </section>
 
         <!-- OFERTAS DESTACADAS -->
@@ -73,30 +79,31 @@
                     Explora oportunidades recomendadas según tu perfil.
                 </p>
 
-                
+
                 <div class="row g-4">
-                    <?
+                    <?php
                     $i = 0;
                     foreach ($ofertas as $o) {
                         if ($i >= 4)
                             break;
-                        ?>
+                        $i++;
+                    ?>
                         <!-- tarjeta -->
                         <div class="col-md-3">
                             <div class="card shadow-sm h-100">
                                 <div class="card-body">
                                     <h5 class="fw-bold">
-                                        <?= $o['titulo'] ?>
+                                        <?= htmlspecialchars($o['titulo']) ?>
                                     </h5>
                                     <p class="text-muted">
-                                        <? foreach ($ubicaciones as $u) {
+                                        <?php foreach ($ubicaciones as $u) {
                                             if ($u['idUbicacion'] == $o['idUbicacion']) {
-                                                echo $u['provincia'] . ', ' . $u['canton'];
+                                                echo htmlspecialchars($u['provincia']) . ', ' . htmlspecialchars($u['canton']);
                                             }
                                         } ?>
                                     </p>
                                     <p class="text-secondary">
-                                        <?= $o['requisitos'] ?>
+                                        <?= htmlspecialchars($o['requisitos']) ?>
                                     </p>
                                     <button class="btn btn-primary btn-sm">
                                         Ver más
@@ -104,36 +111,39 @@
                                 </div>
                             </div>
                         </div>
-                        <? $i++;
-                    } ?>
-
+                    <?php
+                    }
+                    ?>
                 </div>
             </div>
         </section>
 
-        <!-- ofrecer la cuenta -->
-        <section class="ofrecerCuenta">
-            <div class="container">
-                <h2 class="display-6 fw-bold mb-3 text-center">
-                    Crea tu cuenta y empieza a <br> postularte hoy
-                </h2>
-                <p class="mb-4 text-center">
-                    Guarda ofertas, postúlate rápido y recibe recomendaciones.
-                </p>
-                <div class="d-flex flex-column justify-content-center gap-3 ">
-                    <ul class="d-flex flex-column align-items-center list-unstyled center">
-                        <li>
-                            <a href="<?= BASE_URL ?>/?page=registro"><button class="btn btn-primary mb-2">
-                                    Crear cuenta gratis</button></a>
-                        </li>
-                        <li>
-                            <a href="<?= BASE_URL ?>/?page=buscarEmpleos"><button class="btn btn-light mb-2">
-                                    Ver ofertas</button></a>
-                        </li>
-                    </ul>
+        <!-- Ofrecer crear cuenta para acceder a funciones adicionales  -->
+        <!-- Solo ofrecer si el usuario es un invitado -->
+        <?php if ($_SESSION['rol'] === 'invitado'): ?>
+            <section class="ofrecerCuenta">
+                <div class="container">
+                    <h2 class="display-6 fw-bold mb-3 text-center">
+                        Crea tu cuenta y empieza a <br> postularte hoy
+                    </h2>
+                    <p class="mb-4 text-center">
+                        Guarda ofertas, postúlate rápido y recibe recomendaciones.
+                    </p>
+                    <div class="d-flex flex-column justify-content-center gap-3 ">
+                        <ul class="d-flex flex-column align-items-center list-unstyled center">
+                            <li>
+                                <a href="<?= BASE_URL ?>/?page=registro"><button class="btn btn-primary mb-2">
+                                        Crear cuenta gratis</button></a>
+                            </li>
+                            <li>
+                                <a href="<?= BASE_URL ?>/?page=buscarEmpleos"><button class="btn btn-light mb-2">
+                                        Ver ofertas</button></a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        <?php endif; ?>
     </main>
 
     <!-- FOOTER -->

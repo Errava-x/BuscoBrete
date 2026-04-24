@@ -1,8 +1,5 @@
 <?php
 
-/*
-Aqui vive la logica basica de postulaciones.
-*/
 class Postulacion
 {
 	private $conn;
@@ -32,6 +29,31 @@ class Postulacion
 		$stmt->execute();
 
 		return $stmt->get_result()->fetch_assoc();
+	}
+
+	public function getPostulacionesByEmpleador($idEmpleador)
+	{
+		$stmt = $this->conn->prepare("
+        SELECT 
+            p.idPostulacion,
+            p.estado AS estadoPostulacion,
+            p.fechaPostulacion,
+            o.titulo AS oferta,
+            o.salario,
+            c.nombre AS nombreCandidato,
+            c.apellidos AS apellidosCandidato,
+            c.telefono,
+            u.correo
+        FROM postulaciones p
+        INNER JOIN ofertas o ON p.idOferta = o.idOferta
+        INNER JOIN candidatos c ON p.idCandidato = c.id_candidato
+        INNER JOIN usuarios u ON c.idUsuario = u.idUsuario
+        WHERE o.idEmpleador = ?
+        ORDER BY p.fechaPostulacion DESC
+    ");
+		$stmt->bind_param("i", $idEmpleador);
+		$stmt->execute();
+		return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 	}
 
 	public function getByCandidato($idCandidato)
@@ -94,5 +116,31 @@ class Postulacion
 		$stmt->bind_param("i", $idPostulacion);
 
 		return $stmt->execute();
+	}
+
+	public function getByCandidatoFull($idCandidato)
+	{
+		$query = "
+			SELECT 
+				p.idPostulacion,
+				p.estado,
+				p.fechaPostulacion,
+				o.titulo,
+				emp.nombreEmpresa AS nombreEmpresa,
+				u.provincia AS provincia,
+				u.canton AS canton
+			FROM postulaciones p
+			INNER JOIN ofertas o ON p.idOferta = o.idOferta
+			INNER JOIN empleadores emp ON o.idEmpleador = emp.idEmpleador
+			INNER JOIN ubicaciones u ON o.idUbicacion = u.idUbicacion
+			WHERE p.idCandidato = ?
+			ORDER BY p.fechaPostulacion DESC
+		";
+
+		$stmt = $this->conn->prepare($query);
+		$stmt->bind_param("i", $idCandidato);
+		$stmt->execute();
+
+		return $stmt->get_result();
 	}
 }

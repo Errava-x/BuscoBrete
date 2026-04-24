@@ -1,33 +1,30 @@
 $(function () {
     let formLogin = $("#formLogin");
-    const urlBase = "index.php"
 
     formLogin.on("submit", function (event) {
         event.preventDefault();
-        let username = $("#username");
+        let correo = $("#correo");
         let password = $("#password");
 
-        if (username.val() === "" || password.val() === "") {
+        if (correo.val() === "" || password.val() === "") {
             alert("Debe completar todos los campos");
         } else {
-            $.post(urlBase,
+            $.post(BASE_URL + "/index.php",
                 {
-                    username: username.val(),
+                    correo: correo.val(),
                     password: password.val(),
                     option: "login"
                 },
                 function (data, status) {
-                    data = JSON.parse(data);
-                    console.log(data);
-                    if(data.response == "00"){
-                        window.location = data.rol == 'admin' ? "index.php?page=admin" : "index.php?page=talleres";
-                    } else {
-                        alert(data.message)
+                    if (data.response == "00") {
+                        if (data.rol == 'empleador') {
+                            window.location = BASE_URL + "/?page=dashboardReclutador";
+                        } else if (data.rol == 'candidato') {
+                            window.location = BASE_URL + "/?page=home";
+                        } else { alert(data.message) }
                     }
                 });
-
         }
     })
-
-
+    console.log(window.location);
 })

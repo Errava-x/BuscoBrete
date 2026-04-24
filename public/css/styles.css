@@ -36,6 +36,15 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.tarjeta-filtros label {
+    display: block;
+    text-align: center;
+}
+
+.tarjeta-filtros select {
+    text-align: center;
+}
+
 *,
 *::before,
 *::after {
@@ -110,7 +119,10 @@ main {
 }
 
 .auth-card {
-  @extend .card;
+  background: var(--bb-white);
+  border: 1px solid var(--bb-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 2rem 2.2rem;
   width: 40vw;
   min-width: 300px;
@@ -259,6 +271,14 @@ footer a:hover {
 .navbar {
   background: #f1f5f9;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.bb-col {
+  border-right: 1px solid var(--bb-border-2);
+}
+
+.bb-col:last-child {
+  border-right: none;
 }
 
 .bb-stat-card {
